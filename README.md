@@ -1,56 +1,68 @@
-# godot-cpp template
-This repository serves as a quickstart template for GDExtension development with Godot 4.0+.
+# Godot OpenLipSync
 
-## Contents
-* Preconfigured source files for C++ development of the GDExtension ([src/](./src/))
-* An empty Godot project in [project/](./project), to test the GDExtension
-* godot-cpp as a submodule (`godot-cpp/`)
-* GitHub Issues template ([.github/ISSUE_TEMPLATE.yml](./.github/ISSUE_TEMPLATE.yml))
-* GitHub CI/CD workflows to publish your library packages when creating a release ([.github/workflows/builds.yml](./.github/workflows/builds.yml))
-* An SConstruct file with various functions, such as boilerplate for [Adding documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/cpp/gdextension_docs_system.html)
+**A Godot 4.x GDExtension integration of the OpenLipSync architecture.**
 
-## Usage - Template
+> [!NOTE]
+> The core **Temporal Convolutional Network (TCN)** architecture and the reference C# implementation utilized in this project were designed and developed by **[KyuubiYoru](https://github.com/KyuubiYoru)**, originally for the **Resonite** platform. This project serves as a Godot bridge to their excellent work!
 
-To use this template, log in to GitHub and click the green "Use this template" button at the top of the repository page. This will let you create a copy of this repository with a clean git history.
+OpenLipSync is a high-performance, real-time lip synchronization GDExtension for Godot 4.x. It uses a TCN to map audio features (mel spectrograms) to viseme probabilities, providing realistic facial expressions based on audio input.
 
-To get started with your new GDExtension, do the following:
+## Features
 
-* clone your repository to your local computer
-* initialize the godot-cpp git submodule via `git submodule update --init`
-* change the name of the compiled library file inside the [SConstruct](./SConstruct) file by modifying the `libname` string.
-  * change the paths of the to be loaded library name inside the [project/bin/example.gdextension](./project/bin/example.gdextension) file, by replacing `EXTENSION-NAME` with the name you chose for `libname`.
-* change the `entry_symbol` string inside [project/bin/example.gdextension](./project/bin/example.gdextension) file.
-  * rename the `example_library_init` function in [src/register_types.cpp](./src/register_types.cpp) to the same name you chose for `entry_symbol`.
-* change the name of the `project/bin/example.gdextension` file
+*   **GDExtension (C++):** Native performance for audio feature extraction (FFT, Mel-scaling) and model execution.
+*   **Easy Integration:** Drag-and-drop addon structure with a robust GDScript controller.
+*   **Customizable Mapping:** Easily map visemes to any 3D model blend shapes (compatible with VRM, VRoid, etc.).
+*   **Streaming Support:** Handles live microphone input or pre-recorded audio streams.
 
-Now, you can build the project with the following command:
+## Project Structure
 
-```shell
-scons
+*   `godot-openlipsync/`: The main Godot project and GDExtension source.
+    *   `src/`: C++ source code for the GDExtension.
+    *   `project/addons/godot_openlipsync/`: The Godot addon folder.
+        *   `model.onnx`: The core trained TCN model.
+        *   `examples/`: Sample scripts and scenes for VRM/VRoid characters.
+*   `resources/OpenLipSync/`: Original training pipeline and inference references.
+
+## Getting Started
+
+### Prerequisites
+
+*   Godot 4.x (tested with 4.6).
+*   For building from source: SCons and a C++ compiler (GCC/Clang for Linux, MSVC for Windows).
+*   ONNX Runtime libraries (provided in `resources/onnxruntime-linux-x64-1.23.2`).
+
+### Installation
+
+1.  Copy the `addons/godot_openlipsync` folder from the `project` directory into your own Godot project.
+2.  Ensure the `libonnxruntime.so` (Linux) or `onnxruntime.dll` (Windows) is in the same directory as the GDExtension binary.
+
+### Setup for Microphone Input
+
+1.  **Project Settings:** Go to `Project > Project Settings > Audio > Driver` and enable **Enable Input**. Restart Godot.
+2.  **Audio Bus:** Open the **Audio** tab at the bottom of the editor. Create a bus named `Record` (or use the provided sample script which can auto-create it).
+3.  **Microphone Node:** Add an `AudioStreamPlayer` to your scene.
+    *   Set **Stream** to `AudioStreamMicrophone`.
+    *   Set **Bus** to `Record`.
+    *   Enable **Autoplay**.
+4.  **Controller:** Add a node to your scene and attach `res://addons/godot_openlipsync/examples/lipsync_mic_demo.gd`.
+5.  **Assign Mesh:** Drag your character's `MeshInstance3D` into the **Mesh Instance** property in the Inspector.
+6.  **Map Visemes:** In the Inspector, configure the `Viseme Mapping` dictionary to match your mesh's blend shape names. (See the script comments for a reference list of visemes).
+
+## Development
+
+### Building from Source
+
+To build the GDExtension:
+
+```bash
+cd godot-openlipsync
+scons platform=linux target=template_debug
 ```
 
-If the build command worked, you can test it with the [project](./project) project. Import it into Godot, open it, and launch the main scene. You should see it print the following line in the console:
+The build script automatically handles include paths for the bundled ONNX Runtime and sets the RPATH so the extension can find the shared libraries.
 
-```
-Type: 24
-```
+## License
 
-### Configuring an IDE
-You can develop your own extension with any text editor and by invoking scons on the command line, but if you want to work with an IDE (Integrated Development Environment), you can use a compilation database file called `compile_commands.json`. Most IDEs should automatically identify this file, and self-configure appropriately.
-To generate the database file, you can run one of the following commands in the project root directory:
-```shell
-# Generate compile_commands.json while compiling
-scons compiledb=yes
-
-# Generate compile_commands.json without compiling
-scons compiledb=yes compile_commands.json
-```
-
-## Usage - Actions
-
-This repository comes with continuous integration (CI) through a GitHub action that tests building the GDExtension.
-It triggers automatically for each pushed change. You can find and edit it in [builds.yml](.github/workflows/ci.yml).
-
-There is also a workflow ([make_build.yml](.github/workflows/make_build.yml)) that builds the GDExtension for all supported platforms that you can use to create releases.
-You can trigger this workflow manually from the `Actions` tab on GitHub.
-After it is complete, you can find the file `godot-cpp-template.zip` in the `Artifacts` section of the workflow run.
+*   **Godot OpenLipSync (This Project):** Licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+*   **OpenLipSync (Original Architecture):** Licensed under the Apache License 2.0.
+*   **ONNX Runtime:** Licensed under the MIT License by Microsoft Corporation.
