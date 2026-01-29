@@ -5,7 +5,7 @@ import sys
 from methods import print_error
 
 
-libname = "EXTENSION-NAME"
+libname = "godot_openlipsync"
 projectdir = "project"
 
 localEnv = Environment(tools=["default"], PLATFORM="")
@@ -36,6 +36,19 @@ Run the following command to download godot-cpp:
     sys.exit(1)
 
 env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
+
+# Enable exceptions (required for ONNX Runtime C++ API)
+if env["platform"] == "linux":
+    env.Append(CCFLAGS=["-fexceptions"])
+    env.Append(LINKFLAGS=["-Wl,-rpath,'$ORIGIN'"])
+elif env["platform"] == "windows":
+    env.Append(CCFLAGS=["/EHsc"])
+
+
+# ONNX Runtime configuration
+env.Append(CPPPATH=["thirdparty/onnxruntime/include"])
+env.Append(LIBPATH=["thirdparty/onnxruntime/lib"])
+env.Append(LIBS=["onnxruntime"])
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")

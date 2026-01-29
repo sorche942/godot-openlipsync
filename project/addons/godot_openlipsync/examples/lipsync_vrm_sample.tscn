@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://c8q4n2x1x8x8"]
+
+[ext_resource type="Script" uid="uid://c6gqkjef0nxxh" path="res://addons/godot_openlipsync/examples/lipsync_mic_demo.gd" id="1_vrm_demo"]
+[ext_resource type="PackedScene" uid="uid://dx64es0ifdlbr" path="res://assets/snow2.glb" id="2_ja1nq"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ja1nq"]
+sky_top_color = Color(0.423426, 0.17773223, 1, 1)
+sky_horizon_color = Color(0.2150931, 0.06358536, 0.6125805, 1)
+ground_bottom_color = Color(0.08712346, 0.00012279357, 0.21677628, 1)
+ground_horizon_color = Color(0.21568628, 0.0627451, 0.6117647, 1)
+sun_angle_max = 0.0
+
+[sub_resource type="Sky" id="Sky_uyo36"]
+sky_material = SubResource("ProceduralSkyMaterial_ja1nq")
+
+[sub_resource type="Environment" id="Environment_l6djr"]
+background_mode = 2
+background_color = Color(0.23622051, 0.0006307054, 0.41788924, 1)
+sky = SubResource("Sky_uyo36")
+ambient_light_source = 1
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_ja1nq"]
+
+[node name="LipSyncVRMSample" type="Node" unique_id=1012091956 node_paths=PackedStringArray("mesh_instance")]
+script = ExtResource("1_vrm_demo")
+mesh_instance = NodePath("model/Armature/Skeleton3D/Face")
+viseme_mapping = {
+1: "Fcl_MTH_U",
+2: "Fcl_MTH_I",
+3: "Fcl_MTH_I",
+4: "Fcl_MTH_I",
+5: "Fcl_MTH_I",
+6: "Fcl_MTH_I",
+7: "Fcl_MTH_I",
+8: "Fcl_MTH_I",
+9: "Fcl_MTH_I",
+10: "Fcl_MTH_A",
+11: "Fcl_MTH_E",
+12: "Fcl_MTH_I",
+13: "Fcl_MTH_O",
+14: "Fcl_MTH_U"
+}
+
+[node name="model" parent="." unique_id=901631772 instance=ExtResource("2_ja1nq")]
+
+[node name="scene" type="Node3D" parent="." unique_id=625103220]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="scene" unique_id=1783651753]
+environment = SubResource("Environment_l6djr")
+
+[node name="Camera3D" type="Camera3D" parent="scene" unique_id=709178338]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4800476, 0.3979556)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="scene" unique_id=558831307]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6872266, 1.8582268, 1.8034083)
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="scene" unique_id=185042623]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.43314785, 1.6682754, 0.5289761)
+light_energy = 0.2
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="scene" unique_id=1322152134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03652197, 1.2658905, -0.48667347)
+light_energy = 4.0
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=95201298]
+stream = SubResource("AudioStreamMicrophone_ja1nq")
+autoplay = true
+bus = &"Record"
+
+[editable path="model"]

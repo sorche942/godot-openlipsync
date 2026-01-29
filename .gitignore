@@ -32,6 +32,10 @@ compile_commands.json
 *.o
 *.os
 *.so
+!thirdparty/**/*.so
+!thirdparty/**/*.dll
+!thirdparty/**/*.dylib
+!thirdparty/**/*.lib
 *.obj
 *.bc
 *.pyc
